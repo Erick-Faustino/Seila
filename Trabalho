@@ -1,0 +1,137 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Profissional {
+    private String nome;
+    private List<Agenda> agendas;
+
+    public Profissional(String nome) {
+        this.nome = nome;
+        this.agendas = new ArrayList<>();
+    }
+
+    public void criarAgenda(String data) {
+        Agenda novaAgenda = new Agenda(data);
+        agendas.add(novaAgenda);
+    }
+
+    public void listarAgendas() {
+        System.out.println("Agendas de " + nome + ":");
+        for (Agenda agenda : agendas) {
+            System.out.println(agenda.getData());
+        }
+    }
+}
+
+class Agenda {
+    private String data;
+    private List<Horario> horariosDisponiveis;
+    private List<Horario> horariosBloqueados;
+    private List<Solicitacao> solicitacoesPendentes;
+
+    public Agenda(String data) {
+        this.data = data;
+        this.horariosDisponiveis = new ArrayList<>();
+        this.horariosBloqueados = new ArrayList<>();
+        this.solicitacoesPendentes = new ArrayList<>();
+    }
+
+    public void adicionarHorarioDisponivel(Horario horario) {
+        horariosDisponiveis.add(horario);
+    }
+
+    public void bloquearHorario(Horario horario) {
+        if (horariosDisponiveis.contains(horario)) {
+            horariosDisponiveis.remove(horario);
+            horariosBloqueados.add(horario);
+        }
+    }
+
+    public void desbloquearHorario(Horario horario) {
+        if (horariosBloqueados.contains(horario)) {
+            horariosBloqueados.remove(horario);
+            horariosDisponiveis.add(horario);
+        }
+    }
+
+    public void solicitarAgendamento(Solicitacao solicitacao) {
+        solicitacoesPendentes.add(solicitacao);
+    }
+
+    public void cancelarAgendamento(Solicitacao solicitacao) {
+        solicitacoesPendentes.remove(solicitacao);
+    }
+
+    public List<Solicitacao> getSolicitacoesPendentes() {
+        return solicitacoesPendentes;
+    }
+
+    public String getData() {
+        return data;
+    }
+}
+
+class Horario {
+    private String hora;
+
+    public Horario(String hora) {
+        this.hora = hora;
+    }
+
+    public String getHora() {
+        return hora;
+    }
+}
+
+class Solicitacao {
+    private Horario horario;
+    private String paciente;
+
+    public Solicitacao(Horario horario, String paciente) {
+        this.horario = horario;
+        this.paciente = paciente;
+    }
+
+    public Horario getHorario() {
+        return horario;
+    }
+
+    public String getPaciente() {
+        return paciente;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Profissional drSmith = new Profissional("Dr. Smith");
+
+        drSmith.criarAgenda("2023-10-15");
+
+        Agenda agendaDrSmith = drSmith.agendas.get(0);
+
+        Horario horario1 = new Horario("09:00");
+        Horario horario2 = new Horario("10:00");
+
+        agendaDrSmith.adicionarHorarioDisponivel(horario1);
+        agendaDrSmith.adicionarHorarioDisponivel(horario2);
+
+        Solicitacao solicitacao1 = new Solicitacao(horario1, "João");
+        Solicitacao solicitacao2 = new Solicitacao(horario2, "Maria");
+
+        agendaDrSmith.solicitarAgendamento(solicitacao1);
+        agendaDrSmith.solicitarAgendamento(solicitacao2);
+
+        System.out.println("Solicitações pendentes para " + drSmith.nome + " em " + agendaDrSmith.getData() + ":");
+        for (Solicitacao solicitacao : agendaDrSmith.getSolicitacoesPendentes()) {
+            System.out.println(solicitacao.getPaciente() + " deseja agendar às " + solicitacao.getHorario().getHora());
+        }
+
+        // Cancelar uma solicitação
+        agendaDrSmith.cancelarAgendamento(solicitacao1);
+
+        System.out.println("\nSolicitações pendentes após cancelamento:");
+        for (Solicitacao solicitacao : agendaDrSmith.getSolicitacoesPendentes()) {
+            System.out.println(solicitacao.getPaciente() + " deseja agendar às " + solicitacao.getHorario().getHora());
+        }
+    }
+}
